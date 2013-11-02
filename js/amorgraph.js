@@ -18,49 +18,54 @@ function calculate_payment(loan_amount, rate, term) {
 
 function amortize(loan_amount, rate, term, extra_payment) {
     var payment_schedule = [];
-    var principal_amount = loan_amount * 100;
-    var payment_amount = calculate_payment(loan_amount * 100, rate, term);
-    console.log(payment_amount);
+    var principal_amount = loan_amount * 100; // The loan amount, in cents.
+    var payment_amount = calculate_payment(loan_amount * 100, rate, term); // The payment amount ,in cents.
     var total_paid = 0;
     var total_principal_paid = 0;
     var total_interest_paid = 0;
+
     if (!extra_payment) {
         extra_payment = {'frequency': 0, 'amount': 0}
     }
 
-    console.log("Payment Amount: " + payment_amount);
     for (var payment_number = 0; payment_number < term && principal_amount > 0; payment_number++) {
+        var this_payment = payment_amount;
         var interest_paid = calculate_interest(principal_amount, rate, 1);
-        var principal_paid = payment_amount - interest_paid;
+        var principal_paid = 0
 
+        // If this a month in which an extra payment would be made,
+        // increase this payments amount.
         if (payment_number % extra_payment.frequency == 0) {
-            principal_paid += extra_payment.amount * 100;
-            total_paid += extra_payment.amount * 100;
+            this_payment += extra_payment.amount * 100
         }
 
+        principal_paid = this_payment - interest_paid;
+
+        // If the amount of principal being paid by this payment
+        // would be greater than the principal amount left, modify
+        // the payment amount and the principal paid amound.
         if (principal_amount < principal_paid) {
             principal_paid = principal_amount;
-            total_paid -= extra_payment.amount * 100;
+            this_payment = principal_amount + interest_paid
         }
 
+        // Keep track of some overall statistics...
         principal_amount -= principal_paid;
-
-
-        total_paid += payment_amount;
+        total_paid += this_payment;
         total_principal_paid += principal_paid;
         total_interest_paid += interest_paid;
 
+        // Record information about this specific payment, converting back to
+        // a dollar base instead of a cent base.
         payment_schedule.push({'interest_paid': interest_paid.toFixed(0) / 100,
                                'principal_paid': principal_paid.toFixed(0) / 100,
-                               'payment_amount': (principal_paid + interest_paid).toFixed(0) / 100,
+                               'payment_amount': this_payment.toFixed(0) / 100,
                                'principal_amount': principal_amount.toFixed(0) / 100,
                                'total_paid': total_paid.toFixed(0) / 100,
                                'total_principal_paid': total_principal_paid.toFixed(0) / 100,
                                'total_interest_paid': total_interest_paid.toFixed(0) / 100
 
         });
-
-        console.log("Payment " + payment_number + ": " + principal_paid + " | " + interest_paid);
     }
 
     return payment_schedule
