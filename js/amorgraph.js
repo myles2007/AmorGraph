@@ -91,3 +91,55 @@ function display_schedule(amortization_schedule) {
         "iDisplayLength": 24
     });
 }
+
+function graph_payment_breakdown(amortization_schedule) {
+    $('#payment-breakdown').highcharts({
+            chart: {
+                type: 'area'
+            },
+            title: {
+                text: 'Payment Breakdown (Principal vs. Interest)'
+            },
+            xAxis: {
+                tickmarkPlacement: 'on',
+                title: {
+                    text: 'Payment Breakdown (%)'
+                }
+            },
+            yAxis: {
+                title: {
+                    text: 'Payment Amount (Dollars)'
+                },
+            },
+            tooltip: {
+                pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                             '{point.percentage:.1f}%</b> (${point.y:, .2f})<br/>',
+                shared: true,
+            },
+            plotOptions: {
+                area: {
+                    stacking: 'percent',
+                    lineColor: '#666666',
+                    lineWidth: 1,
+                    marker: {
+                        lineWidth: 1,
+                        lineColor: '#666666'
+                    }
+                }
+            },
+            series: [
+
+                     {name: "Principal",
+                      data: $.map(amortization_schedule, function(payment) {
+                            return payment.principal_paid;
+                        })
+                     },
+
+                     {name: "Interest",
+                      data: $.map(amortization_schedule, function(payment) {
+                            return payment.interest_paid;
+                        })
+                     }
+           ]
+        });
+}
