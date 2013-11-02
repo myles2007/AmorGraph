@@ -18,21 +18,31 @@ function calculate_payment(loan_amount, rate, term) {
 
 function amortize(loan_amount, rate, term, extra_payment) {
     var payment_schedule = [];
-    var principal_amount = loan_amount;
-    var payment_amount = calculate_payment(loan_amount, rate, term);
+    var principal_amount = loan_amount * 100;
+    var payment_amount = calculate_payment(loan_amount * 100, rate, term);
+    console.log(payment_amount);
     var total_paid = 0;
     var total_principal_paid = 0;
     var total_interest_paid = 0;
+    if (!extra_payment) {
+        extra_payment = {'frequency': 0, 'amount': 0}
+    }
 
     console.log("Payment Amount: " + payment_amount);
-    for (var payment_number = 0; payment_number < term && principal_amount >= 0; payment_number++) {
+    for (var payment_number = 0; payment_number < term && principal_amount > 0; payment_number++) {
         var interest_paid = calculate_interest(principal_amount, rate, 1);
         var principal_paid = payment_amount - interest_paid;
 
-        if (extra_payment && payment_number % extra_payment.frequency == 0) {
-            principal_paid += extra_payment.amount;
-            total_paid += extra_payment.amount;
+        if (payment_number % extra_payment.frequency == 0) {
+            principal_paid += extra_payment.amount * 100;
+            total_paid += extra_payment.amount * 100;
         }
+
+        if (principal_amount < principal_paid) {
+            principal_paid = principal_amount;
+            total_paid -= extra_payment.amount * 100;
+        }
+
         principal_amount -= principal_paid;
 
 
@@ -40,13 +50,13 @@ function amortize(loan_amount, rate, term, extra_payment) {
         total_principal_paid += principal_paid;
         total_interest_paid += interest_paid;
 
-        payment_schedule.push({'interest_paid': interest_paid,
-                               'principal_paid': principal_paid,
-                               'payment_amount': principal_paid + interest_paid,
-                               'principal_amount': principal_amount,
-                               'total_paid': total_paid,
-                               'total_principal_paid': total_principal_paid,
-                               'total_interest_paid': total_interest_paid
+        payment_schedule.push({'interest_paid': interest_paid.toFixed(0) / 100,
+                               'principal_paid': principal_paid.toFixed(0) / 100,
+                               'payment_amount': (principal_paid + interest_paid).toFixed(0) / 100,
+                               'principal_amount': principal_amount.toFixed(0) / 100,
+                               'total_paid': total_paid.toFixed(0) / 100,
+                               'total_principal_paid': total_principal_paid.toFixed(0) / 100,
+                               'total_interest_paid': total_interest_paid.toFixed(0) / 100
 
         });
 
@@ -70,7 +80,9 @@ function display_schedule(amortization_schedule) {
                       {'sTitle': "Principal Remaining"},
                       {'sTitle': "Total Principal Paid"},
                       {'sTitle': "Total Interest Paid"},
-                      {'sTitle': "Total Paid"}
-        ]
+                      {'sTitle': "Total Paid"},
+
+        ],
+        "iDisplayLength": 24
     });
 }
