@@ -16,7 +16,7 @@ function calculate_payment(loan_amount, rate, term) {
 }
 
 
-function amortize(loan_amount, rate, term, extra_payment) {
+function amortize(loan_amount, rate, term, extra_payments) {
     var payment_schedule = [];
     var principal_amount = loan_amount * 100; // The loan amount, in cents.
     var payment_amount = calculate_payment(loan_amount * 100, rate, term); // The payment amount ,in cents.
@@ -24,8 +24,8 @@ function amortize(loan_amount, rate, term, extra_payment) {
     var total_principal_paid = 0;
     var total_interest_paid = 0;
 
-    if (!extra_payment) {
-        extra_payment = {'frequency': 0, 'amount': 0}
+    if (!extra_payments) {
+        extra_payments = [{'frequency': 0, 'amount': 0}];
     }
 
     for (var payment_number = 0; payment_number < term && principal_amount > 0; payment_number++) {
@@ -35,9 +35,11 @@ function amortize(loan_amount, rate, term, extra_payment) {
 
         // If this a month in which an extra payment would be made,
         // increase this payments amount.
-        if (payment_number % extra_payment.frequency == 0) {
-            this_payment += extra_payment.amount * 100
-        }
+        $.each(extra_payments, function(index, extra_payment) {
+            if (payment_number % extra_payment.frequency == 0) {
+                this_payment += extra_payment.amount * 100
+            }
+        });
 
         principal_paid = this_payment - interest_paid;
 
