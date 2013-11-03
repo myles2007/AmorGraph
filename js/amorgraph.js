@@ -1,3 +1,4 @@
+var GLOBAL_charts_by_id = {}
 
 function calculate_interest(principal, rate, period) {
     compound_rate = 12
@@ -98,8 +99,10 @@ function graph_payment_breakdown(amortization_schedule) {
     $('#payment-breakdown').highcharts({
             chart: {
                 type: 'area',
-                spacingTop: 100,
-                height: 500
+                // height: 500
+                events: {
+                    load: on_graph_load
+                    }
             },
             title: {
                 text: 'Payment Breakdown (Principal vs. Interest)'
@@ -146,25 +149,25 @@ function graph_payment_breakdown(amortization_schedule) {
                      },
 
 
-                     {
-                        type: 'pie',
-                        name: 'Total Breakdown',
-                        data: [{
-                            name: 'Principal',
-                            y: amortization_schedule[amortization_schedule.length - 1].total_principal_paid,
-                            color: Highcharts.getOptions().colors[0] // John's color
-                        }, {
-                            name: 'Interest',
-                            y: amortization_schedule[amortization_schedule.length - 1].total_interest_paid,
-                            color: Highcharts.getOptions().colors[1]
-                        }],
-                        center: [100, -100],
-                        size: 100,
-                        showInLegend: false,
-                        dataLabels: {
-                            enabled: false
-                        }
-                     }
+                     // {
+                        // type: 'pie',
+                        // name: 'Total Breakdown',
+                        // data: [{
+                            // name: 'Principal',
+                            // y: amortization_schedule[amortization_schedule.length - 1].total_principal_paid,
+                            // color: Highcharts.getOptions().colors[0] // John's color
+                        // }, {
+                            // name: 'Interest',
+                            // y: amortization_schedule[amortization_schedule.length - 1].total_interest_paid,
+                            // color: Highcharts.getOptions().colors[1]
+                        // }],
+                        // center: [100, -100],
+                        // size: 100,
+                        // showInLegend: false,
+                        // dataLabels: {
+                            // enabled: false
+                        // }
+                     // }
 
            ]
         });
@@ -173,7 +176,10 @@ function graph_payment_breakdown(amortization_schedule) {
 function graph_payments(amortization_schedule) {
     $('#payments-graph').highcharts({
             chart: {
-                zoomType: 'xy'
+                zoomType: 'xy',
+                events: {
+                    load: on_graph_load
+                    }
             },
             title: {
                 text: 'Amortization Details'
@@ -329,3 +335,21 @@ function graph_payments(amortization_schedule) {
            ]
         });
 }
+
+function on_graph_load(event) {
+    console.log('here');
+    var chart_parent = this.container.parentElement;
+    GLOBAL_charts_by_id[chart_parent.id] = this;
+    $(chart_parent).resizable({ghost: true,
+                               handles: 'ne, se, nw, sw',
+                               stop: (function (chart) {
+                                        return function(event, uiObj) {
+                                            chart.reflow();
+                                        };
+                                     })(this)
+
+    });
+    // This doesn't really look very good...
+    $(chart_parent).children().removeClass('ui-icon ui-icon-gripsmall-diagonal-se');
+}
+

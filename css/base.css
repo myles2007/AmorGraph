@@ -1,0 +1,10 @@
+.graph {
+    border: 1px solid black;
+    display: inline-block;
+}
+
+/* These are ridiculously tiny by default...*/
+.ui-resizable-handle {
+    width: 30;
+    height: 30;
+}
