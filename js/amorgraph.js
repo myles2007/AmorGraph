@@ -97,7 +97,9 @@ function display_schedule(amortization_schedule) {
 function graph_payment_breakdown(amortization_schedule) {
     $('#payment-breakdown').highcharts({
             chart: {
-                type: 'area'
+                type: 'area',
+                spacingTop: 100,
+                height: 500
             },
             title: {
                 text: 'Payment Breakdown (Principal vs. Interest)'
@@ -141,7 +143,189 @@ function graph_payment_breakdown(amortization_schedule) {
                       data: $.map(amortization_schedule, function(payment) {
                             return payment.interest_paid;
                         })
+                     },
+
+
+                     {
+                        type: 'pie',
+                        name: 'Total Breakdown',
+                        data: [{
+                            name: 'Principal',
+                            y: amortization_schedule[amortization_schedule.length - 1].total_principal_paid,
+                            color: Highcharts.getOptions().colors[0] // John's color
+                        }, {
+                            name: 'Interest',
+                            y: amortization_schedule[amortization_schedule.length - 1].total_interest_paid,
+                            color: Highcharts.getOptions().colors[1]
+                        }],
+                        center: [100, -100],
+                        size: 100,
+                        showInLegend: false,
+                        dataLabels: {
+                            enabled: false
+                        }
                      }
+
+           ]
+        });
+}
+
+function graph_payments(amortization_schedule) {
+    $('#payments-graph').highcharts({
+            chart: {
+                zoomType: 'xy'
+            },
+            title: {
+                text: 'Amortization Details'
+            },
+            xAxis: {
+                tickmarkPlacement: 'on',
+                offset: 1,
+                title: {
+                    text: 'Payment Number'
+                }
+            },
+            yAxis: [
+                {
+                    title: {
+                        text: 'Payment Amount (Dollars)'
+                    },
+                    min: 0,
+                },
+                {
+                    // Secondary yAxis
+                    min: 0,
+                    max: amortization_schedule[amortization_schedule.length - 1].total_paid,
+                    opposite: true,
+                    title: {
+                        text: 'Principal Remaining (Dollars)',
+                        style: {
+                            color: '#4572A7'
+                        }
+                    },
+                    labels: {
+                        style: {
+                            color: 'black'
+                        }
+                    }
+                }
+            ],
+            plotOptions: {
+                area: {
+                    stacking: 'normal',
+                    lineColor: '#666666',
+                    lineWidth: 1,
+                    marker: {
+                        lineWidth: 1,
+                        lineColor: '#666666'
+                    }
+                },
+            },
+            tooltip: {
+                headerFormat: '<small><b>Payment #:</b> {point.key}</small><br/><br/>',
+                pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                             '<b>${point.y:.2f} (Total: ${point.total:.2f})</b><br/>',
+                shared: true,
+            },
+            series: [
+                    {
+                        type: 'area',
+                        name: "Principal",
+                        color: '#36362A',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                                    return payment.principal_paid;
+                        })
+                    },
+                    {
+                        type: 'area',
+                        name: "Interest",
+                        color: '#121212',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                            return payment.interest_paid;
+                        }),
+                    },
+
+                    {
+                        type: 'spline',
+                        yAxis: 1,
+                        name: 'Principal Remaining',
+                        color: '#057EF7',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                            return payment.principal_amount;
+                        }),
+                        tooltip: {
+                            pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                                        '<b>${point.y:.2f}</b><br/>',
+                        },
+                    },
+
+                    {
+                        type: 'spline',
+                        yAxis: 1,
+                        name: 'Principal Paid',
+                        color: '#E3E320',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                            return payment.total_principal_paid;
+                        }),
+                        tooltip: {
+                            pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                                        '<b>${point.y:.2f}</b><br/>',
+                        },
+                    },
+
+                    {
+                        type: 'spline',
+                        dashStyle: 'shortdotdash',
+                        shadow: true,
+                        yAxis: 1,
+                        name: 'Interest Paid',
+                        color: '#CF8104',
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                            return payment.total_interest_paid;
+                        }),
+                        tooltip: {
+                            pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                                        '<b>${point.y:.2f}</b><br/>',
+                        },
+                    },
+
+                    {
+                        type: 'spline',
+                        dashStyle: 'shortdot',
+                        shadow: true,
+                        yAxis: 1,
+                        name: 'Total Paid',
+                        color: '#3AD406',
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
+                            return payment.total_paid;
+                        }),
+                        tooltip: {
+                            pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
+                                        '<b>${point.y:.2f}</b><br/>',
+                        },
+                    }
            ]
         });
 }
