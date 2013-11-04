@@ -1,6 +1,6 @@
 .graph {
     border: 1px solid black;
-    display: inline-block;
+    float: left;
 }
 
 /* These are ridiculously tiny by default...*/

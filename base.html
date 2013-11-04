@@ -8,8 +8,25 @@
 <link rel='stylesheet' type='text/css' href='http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/smoothness/jquery-ui.min.css' />
 <link rel='stylesheet' type='text/css' href='css/base.css' />
 
-<div id='payment-breakdown' class='resizable graph'></div>
-<div id='payments-graph' class='resizable graph'></div>
+<div id='loan-info-wrapper'>
+    <label> Loan Amount
+        <input id='loan_amount' type='text'/>
+    </label>
+    <label> Interest Rate (e.g., 5.0)
+        <input id='interest_rate' type='text'/>
+    </label>
+    <label> Term (in months)
+        <input id='term' type='text'/>
+    </label>
+    <div id='extra-payments'>
+    </div>
+    <input id='submit_amortization' type='button' value='Submit'/>
+</div>
+<div id='graph-container'>
+    <div id='payment-breakdown' class='resizable graph'></div>
+    <div id='payment-breakdown-pie' class='resizable graph'></div>
+    <div id='payments-graph' class='resizable graph'></div>
+</div>
 
 <table id='data-table-test'>
     <thead>

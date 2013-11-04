@@ -173,13 +173,50 @@ function graph_payment_breakdown(amortization_schedule) {
         });
 }
 
+function graph_payment_breakdown_pie(amortization_schedule) {
+    $('#payment-breakdown-pie').highcharts({
+        chart: {
+            zoomType: 'xy',
+            events: {
+                load: on_graph_load
+            }
+        },
+        title: {
+            text: 'Grand Total Breakdown'
+        },
+        tooltip: {
+            pointFormat: '{series.name}: <b>{point.percentage:.1f}% (${point.y:.2f})</b>'
+        },
+        plotOptions: {
+            pie: {
+                allowPointSelect: true,
+                cursor: 'pointer',
+                dataLabels: {
+                    enabled: true,
+                    color: '#000000',
+                    connectorColor: '#000000',
+                    format: '<b>{point.name}</b>: {point.percentage:.1f}%'
+                }
+            }
+        },
+        series: [{
+                    type: 'pie',
+                    name: 'Principal Paid vs. Interest Paid',
+                    data: [['Total Principal Paid', amortization_schedule[amortization_schedule.length - 1].total_principal_paid],
+                           ['Total Interest Paid', amortization_schedule[amortization_schedule.length - 1].total_interest_paid],
+
+                    ]
+                }]
+    });
+}
+
 function graph_payments(amortization_schedule) {
     $('#payments-graph').highcharts({
             chart: {
                 zoomType: 'xy',
                 events: {
                     load: on_graph_load
-                    }
+                }
             },
             title: {
                 text: 'Amortization Details'
@@ -340,8 +377,8 @@ function on_graph_load(event) {
     console.log('here');
     var chart_parent = this.container.parentElement;
     GLOBAL_charts_by_id[chart_parent.id] = this;
-    $(chart_parent).resizable({ghost: true,
-                               handles: 'ne, se, nw, sw',
+    $(chart_parent).resizable({
+                               grid: 25,
                                stop: (function (chart) {
                                         return function(event, uiObj) {
                                             chart.reflow();
@@ -353,3 +390,28 @@ function on_graph_load(event) {
     $(chart_parent).children().removeClass('ui-icon ui-icon-gripsmall-diagonal-se');
 }
 
+function submit_amortization(event) {
+    // Gather the information...
+    loan_amount = parseFloat($('#loan_amount').val());
+    interest_rate = parseFloat($('#interest_rate').val()) / 100;
+    term = parseInt($('#term').val());
+    extra_payments = [];
+
+    amortization = amortize(loan_amount, interest_rate, term, extra_payments);
+    graph_payments(amortization);
+    graph_payment_breakdown_pie(amortization);
+    graph_payment_breakdown(amortization);
+    display_schedule(amortization);
+}
+
+function attach_events() {
+    click_events()
+}
+
+function click_events() {
+    $('#submit_amortization').on('click', submit_amortization);
+}
+
+$(document).ready(function () {
+    attach_events();
+});
