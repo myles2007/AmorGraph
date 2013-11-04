@@ -17,7 +17,7 @@ function calculate_payment(loan_amount, rate, term) {
 }
 
 
-function amortize(loan_amount, rate, term, extra_payments) {
+function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than) {
     var payment_schedule = [];
     var principal_amount = loan_amount * 100; // The loan amount, in cents.
     var payment_amount = calculate_payment(loan_amount * 100, rate, term); // The payment amount ,in cents.
@@ -33,6 +33,7 @@ function amortize(loan_amount, rate, term, extra_payments) {
         var this_payment = payment_amount;
         var interest_paid = calculate_interest(principal_amount, rate, 1);
         var principal_paid = 0
+        var percent_interest = null
 
         // If this a month in which an extra payment would be made,
         // increase this payments amount.
@@ -42,7 +43,23 @@ function amortize(loan_amount, rate, term, extra_payments) {
             }
         });
 
+
         principal_paid = this_payment - interest_paid;
+
+        percent_interest = interest_paid / this_payment;
+        console.log(percent_interest);
+        if (percent_interest > interest_no_more_than) {
+            /*
+             * no_
+             */
+            console.log(interest_paid);
+            console.log(interest_no_more_than);
+            console.log(principal_paid);
+            var required_increase = (interest_paid / interest_no_more_than) - this_payment;
+            console.log(required_increase);
+            principal_paid += required_increase;
+            this_payment += required_increase;
+        }
 
         // If the amount of principal being paid by this payment
         // would be greater than the principal amount left, modify
@@ -71,7 +88,7 @@ function amortize(loan_amount, rate, term, extra_payments) {
         });
     }
 
-    return payment_schedule
+    return {'base_payment': payment_amount.toFixed(0) / 100, 'schedule': payment_schedule}
 }
 
 function display_schedule(amortization_schedule) {
@@ -210,7 +227,7 @@ function graph_payment_breakdown_pie(amortization_schedule) {
     });
 }
 
-function graph_payments(amortization_schedule) {
+function graph_payments(amortization_schedule, base_payment) {
     $('#payments-graph').highcharts({
             chart: {
                 zoomType: 'xy',
@@ -234,6 +251,18 @@ function graph_payments(amortization_schedule) {
                         text: 'Payment Amount (Dollars)'
                     },
                     min: 0,
+                    plotLines: [
+                        {
+                            value: base_payment,
+                            dashStyle: 'longDash',
+                            width: 3,
+                            color: 'red',
+                            label: {text: 'Base Payment'},
+                            zIndex: 15
+
+
+                        }
+                    ]
                 },
                 {
                     // Secondary yAxis
@@ -368,7 +397,8 @@ function graph_payments(amortization_schedule) {
                             pointFormat: '<span style="color: {series.color}">{series.name}</span>: ' +
                                         '<b>${point.y:.2f}</b><br/>',
                         },
-                    }
+                    },
+
            ]
         });
 }
@@ -397,11 +427,11 @@ function submit_amortization(event) {
     term = parseInt($('#term').val());
     extra_payments = [];
 
-    amortization = amortize(loan_amount, interest_rate, term, extra_payments);
-    graph_payments(amortization);
-    graph_payment_breakdown_pie(amortization);
-    graph_payment_breakdown(amortization);
-    display_schedule(amortization);
+    var amortization = amortize(loan_amount, interest_rate, term, extra_payments);
+    graph_payments(amortization.schedule, amortization.base_payment);
+    graph_payment_breakdown_pie(amortization.schedule);
+    graph_payment_breakdown(amortization.schedule);
+    display_schedule(amortization.schedule);
 }
 
 function attach_events() {
