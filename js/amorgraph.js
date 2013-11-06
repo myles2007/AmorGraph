@@ -212,12 +212,15 @@ function graph_payment_breakdown_pie(amortization_schedule) {
             pie: {
                 allowPointSelect: true,
                 cursor: 'pointer',
+                colors: ['#36362A', '#121212'],
+                // colors: ['#E3E320', '#CF8104'],
                 dataLabels: {
                     enabled: true,
                     color: '#000000',
                     connectorColor: '#000000',
-                    format: '<b>{point.name}</b>: {point.percentage:.1f}%'
-                }
+                    format: '{point.percentage:.2f}%'
+                },
+                showInLegend: true
             }
         },
         series: [{
@@ -255,14 +258,25 @@ function graph_payments(amortization_schedule, base_payment) {
                         text: 'Payment Amount (Dollars)'
                     },
                     min: 0,
+                    minorTickInterval: 'auto',
+                    minorTickLength: 2,
+                    minorTickWidth: 1,
+                    labels: {
+                                format: '${value:.2f}'
+                    },
                     plotLines: [
                         {
                             value: base_payment,
                             dashStyle: 'longDash',
-                            width: 3,
+                            width: 2,
                             color: 'red',
-                            label: {text: 'Base Payment'},
-                            zIndex: 15
+                            label: {text: 'Base Payment: ($' + base_payment + ')',
+                                    align: 'right',
+                                    verticalAlign: 'bottom',
+                                    style: {color: 'white'},
+                                    y: 15, x: -20
+                            },
+                            zIndex: 5
 
 
                         }
@@ -273,13 +287,12 @@ function graph_payments(amortization_schedule, base_payment) {
                     min: 0,
                     max: amortization_schedule[amortization_schedule.length - 1].total_paid,
                     opposite: true,
+                    gridLineWidth: 0,
                     title: {
-                        text: 'Principal Remaining (Dollars)',
-                        style: {
-                            color: '#4572A7'
-                        }
+                        text: 'Overall Statistics (Dollars)',
                     },
                     labels: {
+                        format: '${value:.2f}',
                         style: {
                             color: 'black'
                         }
