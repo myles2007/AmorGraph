@@ -416,7 +416,13 @@ function submit_amortization(event) {
     loan_amount = parseFloat($('#loan_amount').val());
     interest_rate = parseFloat($('#interest_rate').val()) / 100;
     term = parseInt($('#term').val());
+
     extra_payments = [];
+    $('#extra-payments').find('.extra_payment').each(function(index, extra_pay_inputs) {
+        extra_payments.push({frequency: $(extra_pay_inputs).find('.frequency').val(),
+                             amount: $(extra_pay_inputs).find('.amount').val()
+                            });
+    });
 
     var amortization = amortize(loan_amount, interest_rate, term, extra_payments);
     graph_payments(amortization.schedule, amortization.base_payment);
@@ -425,12 +431,21 @@ function submit_amortization(event) {
     display_schedule(amortization.schedule);
 }
 
+function add_extra_pay_input(event) {
+    var parent = $(event.target).parent();
+    parent.append("<div class='extra_payment'> \
+                    <label> Frequency: <input class='frequency' type='text' /> </label> \
+                    <label> Amount: <input class='amount' type='text' /> </label \
+                  </div>");
+}
+
 function attach_events() {
-    click_events()
+    click_events();
 }
 
 function click_events() {
     $('#submit_amortization').on('click', submit_amortization);
+    $('#add_extra_pay').on('click', add_extra_pay_input);
 }
 
 $(document).ready(function () {
