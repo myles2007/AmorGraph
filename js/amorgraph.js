@@ -47,16 +47,8 @@ function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than
         principal_paid = this_payment - interest_paid;
 
         percent_interest = interest_paid / this_payment;
-        console.log(percent_interest);
         if (percent_interest > interest_no_more_than) {
-            /*
-             * no_
-             */
-            console.log(interest_paid);
-            console.log(interest_no_more_than);
-            console.log(principal_paid);
             var required_increase = (interest_paid / interest_no_more_than) - this_payment;
-            console.log(required_increase);
             principal_paid += required_increase;
             this_payment += required_increase;
         }
@@ -404,7 +396,6 @@ function graph_payments(amortization_schedule, base_payment) {
 }
 
 function on_graph_load(event) {
-    console.log('here');
     var chart_parent = this.container.parentElement;
     GLOBAL_charts_by_id[chart_parent.id] = this;
     $(chart_parent).resizable({
