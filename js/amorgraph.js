@@ -145,17 +145,29 @@ function graph_payment_breakdown(amortization_schedule) {
             },
             series: [
 
-                     {name: "Principal",
-                      data: $.map(amortization_schedule, function(payment) {
+                    {
+                        name: "Principal",
+                        color: '#36362A',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
                             return payment.principal_paid;
                         })
-                     },
+                    },
 
-                     {name: "Interest",
-                      data: $.map(amortization_schedule, function(payment) {
+                    {
+                        name: "Interest",
+                        color: '#121212',
+                        shadow: true,
+                        marker: {
+                            enabled: false
+                        },
+                        data: $.map(amortization_schedule, function(payment) {
                             return payment.interest_paid;
                         })
-                     },
+                    },
 
 
                      // {
@@ -214,7 +226,7 @@ function graph_payment_breakdown_pie(amortization_schedule) {
                     data: [['Total Principal Paid', amortization_schedule[amortization_schedule.length - 1].total_principal_paid],
                            ['Total Interest Paid', amortization_schedule[amortization_schedule.length - 1].total_interest_paid],
 
-                    ]
+                    ],
                 }]
     });
 }
