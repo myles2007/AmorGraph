@@ -427,6 +427,7 @@ function graph_payments(amortization_schedule, base_payment) {
 function on_graph_load(event) {
     var chart_parent = this.container.parentElement;
     GLOBAL_charts_by_id[chart_parent.id] = this;
+    $(this.container).prepend('<div class="sort_handle">Sort with This</div>');
     $(chart_parent).resizable({
                                grid: 25,
                                stop: (function (chart) {
@@ -480,4 +481,5 @@ function click_events() {
 
 $(document).ready(function () {
     attach_events();
+    $('#graph-container').sortable({handle: '.sort_handle'});
 });
