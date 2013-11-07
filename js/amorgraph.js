@@ -29,6 +29,10 @@ function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than
         extra_payments = [{'frequency': 0, 'amount': 0}];
     }
 
+    if (!interest_no_more_than) {
+        interest_no_more_than = 1.1
+    }
+
     for (var payment_number = 0; payment_number < term && principal_amount > 0; payment_number++) {
         var this_payment = payment_amount;
         var interest_paid = calculate_interest(principal_amount, rate, 1);
@@ -438,9 +442,10 @@ function on_graph_load(event) {
 
 function submit_amortization(event) {
     // Gather the information...
-    loan_amount = parseFloat($('#loan_amount').val());
-    interest_rate = parseFloat($('#interest_rate').val()) / 100;
-    term = parseInt($('#term').val());
+    var loan_amount = parseFloat($('#loan_amount').val());
+    var interest_rate = parseFloat($('#interest_rate').val()) / 100;
+    var term = parseInt($('#term').val());
+    var interest_no_more_than = parseInt($('#interest_no_more_than').val()) / 100;
 
     extra_payments = [];
     $('#extra-payments').find('.extra_payment').each(function(index, extra_pay_inputs) {
@@ -449,7 +454,7 @@ function submit_amortization(event) {
                             });
     });
 
-    var amortization = amortize(loan_amount, interest_rate, term, extra_payments);
+    var amortization = amortize(loan_amount, interest_rate, term, extra_payments, interest_no_more_than);
     graph_payments(amortization.schedule, amortization.base_payment);
     graph_payment_breakdown_pie(amortization.schedule);
     graph_payment_breakdown(amortization.schedule);
