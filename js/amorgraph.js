@@ -26,7 +26,7 @@ function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than
     var total_interest_paid = 0;
 
     if (!extra_payments) {
-        extra_payments = [{'frequency': 0, 'amount': 0}];
+        extra_payments = [{'frequency': 0, 'amount': 0, 'delay': 0, 'duration': term }];
     }
 
     if (!interest_no_more_than) {
@@ -42,8 +42,12 @@ function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than
         // If this a month in which an extra payment would be made,
         // increase this payments amount.
         $.each(extra_payments, function(index, extra_payment) {
-            if (payment_number % extra_payment.frequency == 0) {
-                this_payment += extra_payment.amount * 100
+            var expired = extra_payment.duration == 0;
+            var delayMet = extra_payment.delay <= payment_number + 1;
+            var phasedFrequencySatisfied = (payment_number - (extra_payment.delay - 1)) % extra_payment.frequency == 0;
+            if (!expired && delayMet && phasedFrequencySatisfied) {
+                this_payment += extra_payment.amount * 100;
+                extra_payment.duration -= 1;
             }
         });
 
@@ -451,7 +455,9 @@ function submit_amortization(event) {
     extra_payments = [];
     $('#extra-payments').find('.extra_payment').each(function(index, extra_pay_inputs) {
         extra_payments.push({frequency: $(extra_pay_inputs).find('.frequency').val(),
-                             amount: $(extra_pay_inputs).find('.amount').val()
+                             amount: $(extra_pay_inputs).find('.amount').val(),
+                             delay: $(extra_pay_inputs).find('.delay').val() || 0,
+                             duration: $(extra_pay_inputs).find('.duration').val() || term,
                             });
     });
 
@@ -465,8 +471,11 @@ function submit_amortization(event) {
 function add_extra_pay_input(event) {
     var parent = $(event.target).parent();
     parent.append("<div class='extra_payment'> \
-                    <label> Frequency: <input class='frequency' type='text' /> </label> \
-                    <label> Amount: <input class='amount' type='text' /> </label \
+                    <label> Beginning with payment <input class='delay' type=text'/> </label> \
+                    <label> pay an additional <input class='amount' type='text' /> </label> \
+                    <label> every <input class='frequency' type='text' /> </label> \
+                    <label> month(s) for a total of <input class='duration' type='text' /> </label> \
+                    <label> extra payments. </label> \
                   </div>");
 }
 
