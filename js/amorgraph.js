@@ -92,24 +92,15 @@ function amortize(loan_amount, rate, term, extra_payments, interest_no_more_than
 }
 
 function display_schedule(amortization_schedule) {
-    $('#data-table-test').dataTable({
-        "aaData": $.map(amortization_schedule, function(row, index) {
-                        return [[index + 1, row.payment_amount, row.principal_paid, row.interest_paid,
-                                 row.principal_amount, row.total_principal_paid, row.total_interest_paid,
-                                 row.total_paid]];
-                  }),
-        "aoColumns": [{'sTitle': "Payment Number"},
-                      {'sTitle': "Payment Amount"},
-                      {'sTitle': "Principal Paid"},
-                      {'sTitle': "Interest Paid"},
-                      {'sTitle': "Principal Remaining"},
-                      {'sTitle': "Total Principal Paid"},
-                      {'sTitle': "Total Interest Paid"},
-                      {'sTitle': "Total Paid"},
-
-        ],
-        "iDisplayLength": 24
-    });
+    var schedule = $('#data-table-test').dataTable();
+    schedule.fnClearTable();
+    schedule.fnAddData($.map(amortization_schedule, function(row, index) {
+                                return [[index + 1, row.payment_amount, row.principal_paid, row.interest_paid,
+                                         row.principal_amount, row.total_principal_paid, row.total_interest_paid,
+                                         row.total_paid]];
+                            })
+                       );
+    schedule.fnDraw();
 }
 
 function graph_payment_breakdown(amortization_schedule) {
@@ -491,4 +482,17 @@ function click_events() {
 $(document).ready(function () {
     attach_events();
     $('#graph-container').sortable({handle: '.sort_handle'});
+    $('#data-table-test').dataTable({
+        "aoColumns": [{'sTitle': "Payment Number"},
+                      {'sTitle': "Payment Amount"},
+                      {'sTitle': "Principal Paid"},
+                      {'sTitle': "Interest Paid"},
+                      {'sTitle': "Principal Remaining"},
+                      {'sTitle': "Total Principal Paid"},
+                      {'sTitle': "Total Interest Paid"},
+                      {'sTitle': "Total Paid"}],
+
+        "iDisplayLength": 24
+    });
+
 });
